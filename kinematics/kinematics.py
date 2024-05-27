@@ -1,5 +1,5 @@
 import numpy as np
-from KinematicChain import KinematicTransform, KinematicChain
+from kinematics.KinematicStruct import KinematicTransform, KinematicChain
 
 def velocity_transport_theorem(p: np.ndarray, v: np.ndarray, omega: np.ndarray, v_BN: np.ndarray) -> np.ndarray:
     '''
@@ -38,7 +38,7 @@ def acceleration_transport_theorem(
     in the frame in which the input vectors are expressed in.
     '''
 
-    return a_BN + a + np.cross(alpha, p) + 2 * np.cross(omega, v) + np.cross(omega, np.cross(omega, p)
+    return a_BN + a + np.cross(alpha, p) + 2 * np.cross(omega, v) + np.cross(omega, np.cross(omega, p))
 
 def position_kinematic_chain(kinematic_chain: KinematicChain):
     '''

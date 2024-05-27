@@ -8,6 +8,7 @@ class KinematicTransform:
     def __init__(self, t: np.ndarray, R: np.ndarray,
                  omega: np.ndarray, alpha: np.ndarray, v: np.ndarray, a: np.ndarray):
         '''
+        All vectors are expressed in frame A.
         :param t: The vector pointing from origin of A to B.
         :param R: The rotation matrix from A to B.
         :param omega: The angular velocity of B relative to A.
@@ -15,12 +16,12 @@ class KinematicTransform:
         :param v: The velocity of B relative to A.
         :param a: The acceleartion of B relative to A.
         '''
-        self.t = t
-        self.R = R
-        self.omega = omega
-        self.alpha = alpha
-        self.v = v
-        self.a = a
+        self._t = t
+        self._R = R
+        self._omega = omega
+        self._alpha = alpha
+        self._v = v
+        self._a = a
 
     @property
     def t(self) -> np.ndarray:
@@ -56,11 +57,13 @@ class KinematicChain:
     '''
     Represents a chain of kinematic transforms.
     '''
-    def __init__(self, transforms: List[KinematicTransform]):
+    def __init__(self, transforms=None):
         '''
         :param transforms: A list of KinematicTransform objects.
         '''
-        self._transforms = transforms
+        self._transforms = []
+        if not transforms is None:
+            self._transforms = transforms
 
     @property
     def transforms(self) -> List[KinematicTransform]:
