@@ -5,8 +5,7 @@ class KinematicTransform:
     '''
     Kinetmatic transform between frame A and B, or A->B.
     '''
-    def __init__(self, t: np.ndarray, R: np.ndarray,
-                 omega: np.ndarray, alpha: np.ndarray, v: np.ndarray, a: np.ndarray):
+    def __init__(self, t, R, omega, alpha, v, a):
         '''
         All vectors are expressed in frame A.
         :param t: The vector pointing from origin of A to B.
@@ -24,32 +23,32 @@ class KinematicTransform:
         self._a = a
 
     @property
-    def t(self) -> np.ndarray:
+    def t(self):
         '''Get the vector pointing from origin of A to B.'''
         return self._t
 
     @property
-    def R(self) -> np.ndarray:
+    def R(self):
         '''Get the rotation matrix from A to B.'''
         return self._R
 
     @property
-    def omega(self) -> np.ndarray:
+    def omega(self):
         '''Get the angular velocity of B relative to A.'''
         return self._omega
 
     @property
-    def alpha(self) -> np.ndarray:
+    def alpha(self):
         '''Get the angular acceleration of B relative to A.'''
         return self._alpha
 
     @property
-    def v(self) -> np.ndarray:
+    def v(self):
         '''Get the velocity of B relative to A.'''
         return self._v
 
     @property
-    def a(self) -> np.ndarray:
+    def a(self):
         '''Get the acceleration of B relative to A.'''
         return self._a
 

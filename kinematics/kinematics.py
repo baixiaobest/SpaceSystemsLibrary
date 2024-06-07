@@ -1,4 +1,5 @@
 import numpy as np
+from MathUtil import *
 from kinematics.KinematicStruct import KinematicTransform, KinematicChain
 
 def velocity_transport_theorem(p: np.ndarray, v: np.ndarray, omega: np.ndarray, v_BN: np.ndarray) -> np.ndarray:
@@ -17,11 +18,9 @@ def velocity_transport_theorem(p: np.ndarray, v: np.ndarray, omega: np.ndarray, 
     in the frame in which the input vectors are expressed in.
     '''
 
-    return v + v_BN + np.cross(omega, p)
+    return v + v_BN + cross_product(omega, p)
 
-def acceleration_transport_theorem(
-        p: np.ndarray, v: np.ndarray, a: np.ndarray, omega: np.ndarray,
-        alpha: np.ndarray, a_BN: np.ndarray) -> np.ndarray:
+def acceleration_transport_theorem(p, v, a, omega, alpha, a_BN):
     '''
     Transform the acceleration vector relative to frame B to relative to frame N.
     B and N are rotating and translating relative to each other.
@@ -38,7 +37,7 @@ def acceleration_transport_theorem(
     in the frame in which the input vectors are expressed in.
     '''
 
-    return a_BN + a + np.cross(alpha, p) + 2 * np.cross(omega, v) + np.cross(omega, np.cross(omega, p))
+    return a_BN + a + cross_product(alpha, p) + 2 * cross_product(omega, v) + cross_product(omega, cross_product(omega, p))
 
 def position_kinematic_chain(kinematic_chain: KinematicChain):
     '''
@@ -51,6 +50,9 @@ def position_kinematic_chain(kinematic_chain: KinematicChain):
 
     n = len(kinematic_chain)
     p = np.zeros(3)
+    if is_sympy(kinematic_chain):
+        p = sp.Matrix([0, 0, 0])
+
     for i in reversed(range(0, n)):
         transform = kinematic_chain[i]
         p = transform.R @ p
@@ -67,6 +69,10 @@ def velocity_transport_kinematic_chain(kinematic_chain: KinematicChain):
     n = len(kinematic_chain)
     p = np.zeros(3)
     v = np.zeros(3)
+    if is_sympy(kinematic_chain):
+        p = sp.Matrix([0, 0, 0])
+        v = sp.Matrix([0, 0, 0])
+
     for i in reversed(range(0, n)):
         transform = kinematic_chain[i]
         v = transform.R @ v
@@ -87,6 +93,11 @@ def acceleration_transport_kinematic_chain(kinematic_chain: KinematicChain):
     p = np.zeros(3)
     v = np.zeros(3)
     a = np.zeros(3)
+    if is_sympy(kinematic_chain):
+        p = sp.Matrix([0, 0, 0])
+        v = sp.Matrix([0, 0, 0])
+        a = sp.Matrix([0, 0, 0])
+
     for i in reversed(range(0, n)):
         transform = kinematic_chain[i]
         v = transform.R @ v
