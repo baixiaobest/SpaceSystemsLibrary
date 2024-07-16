@@ -108,3 +108,17 @@ def acceleration_transport_kinematic_chain(kinematic_chain: KinematicChain):
         p += transform.t
 
     return a
+
+
+def euler_321_to_DCM(yaw, pitch, roll):
+    c1 = np.cos(yaw)
+    c2 = np.cos(pitch)
+    c3 = np.cos(roll)
+    s1 = np.sin(yaw)
+    s2 = np.sin(pitch)
+    s3 = np.sin(roll)
+
+    return np.array([
+        [c2*c1,          c2*s1,          -s2],
+        [s3*s2*c1-c3*s1, s3*s2*s1+c3*c1, s3*c2],
+        [c3*s2*c1+s3*s1, c3*s2*s1-s3*c1, c3*c2]])
