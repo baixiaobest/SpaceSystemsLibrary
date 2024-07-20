@@ -109,8 +109,16 @@ def acceleration_transport_kinematic_chain(kinematic_chain: KinematicChain):
 
     return a
 
-
 def euler_321_to_DCM(yaw, pitch, roll):
+    '''
+    Two frames are under consideration: Inertial frame N and body fixed frame B.
+        Given 3-2-1 euler angles for B relative to N, returns the rotation matrix that transforms
+        vector from frame N to frame B.
+    :param yaw: yaw
+    :param pitch: pitch
+    :param roll: roll
+    :return: 3x3 rotation matrix.
+    '''
     c1 = np.cos(yaw)
     c2 = np.cos(pitch)
     c3 = np.cos(roll)
@@ -122,3 +130,22 @@ def euler_321_to_DCM(yaw, pitch, roll):
         [c2*c1,          c2*s1,          -s2],
         [s3*s2*c1-c3*s1, s3*s2*s1+c3*c1, s3*c2],
         [c3*s2*c1+s3*s1, c3*s2*s1-s3*c1, c3*c2]])
+
+def body_anuglar_velocity_to_321_euler_rates_matrix(pitch, roll):
+    '''
+    A matrix that transforms body frame angular velocity to 3-2-1 euler rates.
+    [w1, w2, w3] to [yaw rate, pitch rate, roll rate]
+    :param pitch: pitch
+    :param roll: roll
+    :return: 3x3 matrix.
+    '''
+    s_pitch = np.sin(pitch)
+    c_pitch = np.cos(pitch)
+    s_roll = np.sin(roll)
+    c_roll = np.cos(roll)
+    M = 1.0 / c_pitch * np.array([
+        [0, s_roll, c_roll],
+        [0, c_roll * c_pitch, -s_roll * c_pitch],
+        [c_pitch, s_roll * s_pitch, c_roll * s_pitch]])
+
+    return M

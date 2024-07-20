@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.integrate import solve_ivp
-from kinematics.kinematics import euler_321_to_DCM
-from numpy.linalg import inv
+from kinematics.kinematics import euler_321_to_DCM, body_anuglar_velocity_to_321_euler_rates_matrix
+from numpy.linalg import inv, norm
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
@@ -24,14 +24,7 @@ def get_dxdt(I, L):
         w_B = x[3:6]
         w_B_dt = I_inv @ (-np.cross(w_B, I @ w_B) + L(t))
 
-        s_pitch = np.sin(pitch)
-        c_pitch = np.cos(pitch)
-        s_roll = np.sin(roll)
-        c_roll = np.cos(roll)
-        M = 1.0/c_pitch * np.array([
-            [0, s_roll,               c_roll],
-            [0, c_roll*c_pitch, -s_roll*c_pitch],
-            [c_pitch,           s_roll*s_pitch, c_roll*s_pitch]])
+        M = body_anuglar_velocity_to_321_euler_rates_matrix(pitch, roll)
 
         return np.concatenate((M @ w_B, w_B_dt))
 
@@ -58,7 +51,7 @@ if __name__=="__main__":
 
     x0 = np.array([yaw0, pitch0, roll0, w_N0[0], w_N0[1], w_N0[2]]) # yaw, pitch, roll, angular velocity w1, w2, w3 in body frame.
 
-    t_span = (0, 100)
+    t_span = (0, 1000)
     t_eval = np.linspace(t_span[0], t_span[1], (t_span[1] - t_span[0]) * 10)
 
     dxdt_func = get_dxdt(I, L)
@@ -78,6 +71,7 @@ if __name__=="__main__":
     H1 = []
     H2 = []
     H3 = []
+    H_mag = []
 
     for i in range(len(solution.t)):
         R_B_N = euler_321_to_DCM(yaw[i], pitch[i], roll[i])
@@ -92,9 +86,10 @@ if __name__=="__main__":
         H1.append(H_N[0])
         H2.append(H_N[1])
         H3.append(H_N[2])
+        H_mag.append(norm(H_N))
 
     # Plot the results
-    plt.figure(figsize=(12, 8))
+    plt.figure(figsize=(6, 4))
 
     plt.subplot(3, 1, 1)
     plt.plot(solution.t, yaw, label='Yaw')
@@ -120,7 +115,7 @@ if __name__=="__main__":
     plt.tight_layout()
 
     # Anuglar velocity
-    plt.figure(figsize=(12, 8))
+    plt.figure(figsize=(6, 4))
 
     plt.subplot(3, 1, 1)
     plt.plot(solution.t, w1, label='W_B1')
@@ -144,6 +139,36 @@ if __name__=="__main__":
     plt.legend()
 
     plt.tight_layout()
+
+    plt.figure(figsize=(6, 4))
+
+    plt.subplot(4, 1, 1)
+    plt.plot(solution.t, H1, label='Spacecraft angular momentum H1')
+    plt.xlabel('Time [s]')
+    plt.ylabel('H1 [kg*m^2/s]')
+    plt.grid(True)
+    plt.legend()
+
+    plt.subplot(4, 1, 2)
+    plt.plot(solution.t, H2, label='Spacecraft angular momentum H2')
+    plt.xlabel('Time [s]')
+    plt.ylabel('H2 [kg*m^2/s]')
+    plt.grid(True)
+    plt.legend()
+
+    plt.subplot(4, 1, 3)
+    plt.plot(solution.t, H3, label='Spacecraft angular momentum H3')
+    plt.xlabel('Time [s]')
+    plt.ylabel('H3 [kg*m^2/s]')
+    plt.grid(True)
+    plt.legend()
+
+    plt.subplot(4, 1, 4)
+    plt.plot(solution.t, H_mag, label='Spacecraft angular momentum norm')
+    plt.xlabel('Time [s]')
+    plt.ylabel('|H| [kg*m^2/s]')
+    plt.grid(True)
+    plt.legend()
 
     # Ploting animation
     fig = plt.figure()
